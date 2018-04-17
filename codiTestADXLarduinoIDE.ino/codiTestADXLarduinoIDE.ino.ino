@@ -27,24 +27,30 @@ void loop(){
 	Serial.print(y);
 	Serial.print(" , ");
 	Serial.println(z);
-  delay (250); 
   //Serial.println(start); 
   if (start = 1) {
+    delay (250); 
+    adxl.readXYZ(&x2, &y2, &z2);
     start = 0;
   }
   if (start == 0){
     //Serial.print("dintre");
-    Serial.println(x-x2);
-    if ( (x >= x2 + mark_up) or (x <= x2 - mark_up)  ){
-      movment = true;
-      Serial.println("movment=true;");  
-    }
+    //Serial.println(x-x2);
+    if ((x >= x2 + mark_up) or (x <= x2 - mark_up)){
+      if ((y >= y2 + mark_up) or (y <= y2 - mark_up)){
+        movment = true;
+        Serial.println("movment = true;");  
+      } //fi Y   
+      else{
+        movment = false;
+      } //else Y
+    } //fi X
     else{
       movment = false;
-    }
-  }
-	
- adxl.readXYZ(&x2, &y2, &z2);
+    } //else X
+  } // start = 0
+	delay (250); 
+  adxl.readXYZ(&x2, &y2, &z2);
   Serial.print("values2: ");
   Serial.print(x2);
   Serial.print(" , ");
@@ -52,12 +58,18 @@ void loop(){
   Serial.print(" , ");
   Serial.println(z2);
   //Serial.println(start);
-  if ( (x = x2) or (x = x2 + mark_up) or (x = x2 - mark_up) ){
+  
+  if ((x >= x2 + mark_up) or (x <= x2 - mark_up)){
+    if ((y >= y2 + mark_up) or (y <= y2 - mark_up)){
+      movment = true;
+      Serial.println("movment = true;");  
+      } //fi Y   
+    else{
       movment = false;
-    }
+    } //else Y
+  } //fi X
   else{
-    movment = true;
-    Serial.println("movment=true;");
-    }
+    movment = false;
+  } //else X
   delay(250); 
 }
