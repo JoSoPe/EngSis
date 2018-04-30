@@ -13,7 +13,7 @@ void setup(){
   Serial.begin(9600);
   adxl.powerOn();
   start = 1;
-  mark_up = 10;
+  mark_up = 60;
   movment = false;
 }
 
@@ -21,7 +21,7 @@ void loop(){
   
 	adxl.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
 	// Output x,y,z values 
-	Serial.print("values : ");
+	//Serial.print("values : ");
 	Serial.print(x);
 	Serial.print(" , ");
 	Serial.print(y);
@@ -39,7 +39,7 @@ void loop(){
     if ((x >= x2 + mark_up) or (x <= x2 - mark_up)){
       if ((y >= y2 + mark_up) or (y <= y2 - mark_up)){
         movment = true;
-        Serial.println("movment = true;");  
+        //Serial.println("movment = true;");  
       } //fi Y   
       else{
         movment = false;
@@ -51,7 +51,7 @@ void loop(){
   } // start = 0
 	delay (250); 
   adxl.readXYZ(&x2, &y2, &z2);
-  Serial.print("values2: ");
+  //Serial.print("values2: ");
   Serial.print(x2);
   Serial.print(" , ");
   Serial.print(y2);
@@ -62,7 +62,7 @@ void loop(){
   if ((x >= x2 + mark_up) or (x <= x2 - mark_up)){
     if ((y >= y2 + mark_up) or (y <= y2 - mark_up)){
       movment = true;
-      Serial.println("movment = true;");  
+      //Serial.println("movment = true;");  
       } //fi Y   
     else{
       movment = false;
