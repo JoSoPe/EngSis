@@ -21,17 +21,17 @@ def read_txt():
         con.commit()
         #
     f = open("sensor.txt","r")
-    read = f.readlines()
-    read2 = [x.strip() for x in read]
+    info = f.readlines()
+    read = [x.strip() for x in info]
     t = []
-    for element in read2:
-        t.append(tuple(element.split(" , ")))
-    t2 = list(t)
-    data = "INSERT INTO lectures(eixX,eixY,eixZ) VALUES (?,?,?)"
+    for sample in read:
+        t.append(tuple(sample.split(" , ")))
+    data = list(t)
+    action = "INSERT INTO lectures(eixX,eixY,eixZ) VALUES (?,?,?)"
     con = lite.connect('lecturasensor.db')
     with con:
         cur = con.cursor()
-        cur.executemany(data,t2)
+        cur.executemany("INSERT INTO lectures(eixX,eixY,eixZ) VALUES (?,?,?)",data)
         con.commit()
     con.close()
     f.close()
@@ -44,7 +44,7 @@ def txt2database():
         DROP TABLE IF EXISTS lectures;
         CREATE TABLE lectures(
         rowid integer primary key,
-        eixX float(5),
+        eixX real(5),
         eixY real(5),
         eixZ real(5)
         );

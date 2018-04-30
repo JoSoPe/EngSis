@@ -49,7 +49,7 @@ void loop(){
       movment = false;
     } //else X
   } // start = 0
-	delay (250); 
+	delay (50); 
   adxl.readXYZ(&x2, &y2, &z2);
   //Serial.print("values2: ");
   Serial.print(x2);
@@ -71,5 +71,5 @@ void loop(){
   else{
     movment = false;
   } //else X
-  delay(250); 
+  delay(50); 
 }
