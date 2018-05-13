@@ -52,7 +52,31 @@ def read_txt(m):
 
 
 def main():
-    print ("main")
-    m = str(input("entra tipus de dada:  "))
-    read_txt(m)
+    print ("Inici")
+    print("")
+    t = True
+    while t:
+        print ("")
+        print (" 1 - Afegir dades de caigudes")
+        print (" 2 - Afegir dades de caminar")
+        print (" 3 - Afegir dades d'escales")
+        print (" 4 - Afegir dades de seure i aixecar")
+        print ("Altres - sortir")
+        option = eval(input("Opció escollida"))
+        if option == 1:
+            m = str("caiguda")
+            read_txt(m)
+        elif option == 2:
+            m = str("caminar")
+            read_txt(m)
+        elif option == 3:
+            m = str("escales")
+            read_txt(m)
+        elif option == 4:
+            m = str("seure")
+            read_txt(m)
+        else:
+            print("fi")
+            t = False
+            
 main()
