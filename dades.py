@@ -72,7 +72,7 @@ def read_txt(m):
 
 def export_data(export):
     con = lite.connect('lecturasensor.db')
-    f = open("exported_data.txt", "w+")
+    f = open("exported_data.csv", "w+")
     with con:
         cur = con.cursor()
         if (export == 1) :#exporta tot 
@@ -81,15 +81,15 @@ def export_data(export):
             for data in exportar:
                 p = 0
                 for information in data:
-                    print (data)
+                    #print (data)
                     #print (p)
                     if p == 5:
                         f.write(str(information))
-                        f.write('\n')
+                        f.write(';')
                     if (p ==1) or (p == 2) or (p ==3):
                         p = p+1
                         f.write(str(information))
-                        f.write(' ')
+                        f.write(',')
                     else:
                         p = p+1
         else:
@@ -134,3 +134,6 @@ def main():
             t = False
             
 main()
+
+
+#select rowid,eixX,eixY,eixZ,data_type,prova_id from lectures where abs(eixX)>300 and (abs(eixY)>145 or abs(eixZ)>145);
