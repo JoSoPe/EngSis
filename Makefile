@@ -1,11 +1,11 @@
 delete:
 	\rm -f *.db
-
-dump:
-	python dades.py 
 dades:
-	emacs sensor.txt &
-
+	python3 dades.py 
+lite:
+	sqlite3 lecturasensor.db
+octave:
+	octave
 .PHONY:
 
 clean:

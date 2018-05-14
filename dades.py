@@ -72,7 +72,7 @@ def read_txt(m):
 
 def export_data(export):
     con = lite.connect('lecturasensor.db')
-    f = open("exported_data.csv", "w+")
+    f = open("exported.txt", "w+")
     with con:
         cur = con.cursor()
         if (export == 1) :#exporta tot 
@@ -85,7 +85,7 @@ def export_data(export):
                     #print (p)
                     if p == 5:
                         f.write(str(information))
-                        f.write(';')
+                        f.write('\n')
                     if (p ==1) or (p == 2) or (p ==3):
                         p = p+1
                         f.write(str(information))
@@ -109,13 +109,15 @@ def main():
         print (" 2 - Afegir dades de caminar")
         print (" 3 - Afegir dades d'escales")
         print (" 4 - Afegir dades de seure i aixecar")
-        print (" 5 - Crear base de dades")
+        print (" 5 - Exportar el contingud de la base de dades")
+        print (" 6 - Crear base de dades")
         print (" Altres - Sortir")
-        option = eval(input("Opció escollida"))
-        if option == 0:
+        option = eval(input("Opció escollida :   "))
+        #if option == 0:
             #prova()
-            export_data(1)
-        elif option ==1:
+            #export_data(1)
+        if option == 1:
+        #elif option == 1:
             m = str("caiguda")
             read_txt(m)
         elif option == 2:
@@ -128,6 +130,8 @@ def main():
             m = str("seure")
             read_txt(m)
         elif option == 5:
+            export_data(1)
+        elif option == 6:
             create_db()            
         else:
             print("fi")
@@ -136,4 +140,4 @@ def main():
 main()
 
 
-#select rowid,eixX,eixY,eixZ,data_type,prova_id from lectures where abs(eixX)>300 and (abs(eixY)>145 or abs(eixZ)>145);
+
