@@ -12,6 +12,13 @@ La base de dades de tot el projecte és lecturasensor.db
 Les dades per importar a la base de dades han d'estar en el document sensor.txt
 
 Les dades exportades de la base de dades es guardaran en el document exported.txt
+-----------------------------------------------------
+Llibreria timer:
+https://playground.arduino.cc/Code/Timer
+
+
+
+------------------------------------------------------
 
 Com executar els codis:
 

@@ -1,33 +1,80 @@
 #include <Wire.h>
 #include <ADXL345.h> /*https://github.com/sparkfun/SparkFun_ADXL345_Arduino_Library/blob/master/src/SparkFun_ADXL345.h */
 #include <stdio.h>
-
+#include <Timer.h>
 ADXL345 adxl; //variable adxl is an instance of the ADXL345 library
-int x2,y2,z2;
-int x,y,z; 
-int start;
-int mark_up; 
-bool movment;
-  
+
+
+typedef struct{//per guardar les dades
+  int x;//x value
+  int y;
+  int z;
+} lect;
+
+  int x,y,z;
+  int start;
+  int mark_up,mark_upx,mark_upyz;
+  bool movment;
+  lect a,b;
+    
 void setup(){
   Serial.begin(9600);
   adxl.powerOn();
   start = 1;
-  mark_up = 60;
+  mark_upx = 300;
+  mark_upyz = 145;
   movment = false;
 }
 
-void loop(){
+lect sensordata(lect a){
+  adxl.readXYZ(&a.x, &a.y, &a.z); 
+  return a;
+}
+  
+void toprint(int a,int b,int c){
+  Serial.print(a);
+  Serial.print(" , ");
+  Serial.print(b);
+  Serial.print(" , ");
+  Serial.println(c);
+  //Serial.print("correcte");
+}
+
+bool moviment_brusc(lect a,char eix){
+  bool moviment;
+  switch (eix){
+    case 'x':
+      if ((a.x >= mark_upx) or (a.x <= - mark_upx)){
+        moviment = true;
+      }
+      else{
+        moviment = false;
+      }
+    case 'y':
+      if ((a.y >= mark_upyz) or (a.y <= - mark_upyz)){
+        moviment = true;
+      }
+      else{
+        moviment = false;
+      }
+    default:
+      if ((a.z >= mark_upyz) or (a.z <= - mark_upyz)){
+        moviment = true;
+      }
+      else{
+        moviment = false;
+      }
+  }
+  return moviment;
+}
+
+/*void loop(){
   
 	adxl.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
 	// Output x,y,z values 
 	//Serial.print("values : ");
-	Serial.print(x);
-	Serial.print(" , ");
-	Serial.print(y);
-	Serial.print(" , ");
-	Serial.println(z);
-  //Serial.println(start); 
+	toprint(x,y,z);
+	//Serial.println(start); 
   if (start = 1) {
     delay (250); 
     adxl.readXYZ(&x2, &y2, &z2);
@@ -52,11 +99,7 @@ void loop(){
 	delay (50); 
   adxl.readXYZ(&x2, &y2, &z2);
   //Serial.print("values2: ");
-  Serial.print(x2);
-  Serial.print(" , ");
-  Serial.print(y2);
-  Serial.print(" , ");
-  Serial.println(z2);
+  toprint(x2,y2,z2);
   //Serial.println(start);
   
   if ((x >= x2 + mark_up) or (x <= x2 - mark_up)){
@@ -73,3 +116,12 @@ void loop(){
   } //else X
   delay(50); 
 }
+*/
+void test(){
+//  t.every(25,toprint(x,y,z))
+}
+
+void loop(){
+  Serial.print("dintre");
+}
+

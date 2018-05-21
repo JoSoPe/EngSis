@@ -63,7 +63,7 @@ def read_txt(m):
         dades.append(tupla2)
     with con:
         cur = con.cursor()
-        cur.executemany("INSERT INTO lectures(eixX,eixY,eixZ,data_type,prova_id) VALUES (?,?,?,?,?)",dades)
+        cur.executemany(action,dades)
         con.commit()
     con.close()
     f.close()
