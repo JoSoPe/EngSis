@@ -10,13 +10,14 @@ typedef struct{//per guardar les dades
   int y;
   int z;
 } lect;
-
+/*-------------------*/    
   int x,y,z;
   int start;
   int mark_up,mark_upx,mark_upyz;
   bool movment;
   lect a,b;
-    
+  Timer t;
+/*-------------------*/    
 void setup(){
   Serial.begin(9600);
   adxl.powerOn();
@@ -31,12 +32,12 @@ lect sensordata(lect a){
   return a;
 }
   
-void toprint(int a,int b,int c){
-  Serial.print(a);
+void toprint(lect a){
+  Serial.print(a.x);
   Serial.print(" , ");
-  Serial.print(b);
+  Serial.print(a.y);
   Serial.print(" , ");
-  Serial.println(c);
+  Serial.println(a.z);
   //Serial.print("correcte");
 }
 
@@ -118,10 +119,13 @@ bool moviment_brusc(lect a,char eix){
 }
 */
 void test(){
-//  t.every(25,toprint(x,y,z))
+  Serial.print("dintre");
+  Serial.print(" , ");
 }
 
 void loop(){
-  Serial.print("dintre");
+  void(*foo)(void);
+  foo = &test;
+  t.every(25,test);
 }
 
