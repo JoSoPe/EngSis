@@ -2,6 +2,7 @@
 #include <ADXL345.h> /*https://github.com/sparkfun/SparkFun_ADXL345_Arduino_Library/blob/master/src/SparkFun_ADXL345.h */
 #include <stdio.h>
 #include <Timer.h>
+#include <TimerOne.h>
 ADXL345 adxl; //variable adxl is an instance of the ADXL345 library
 
 
@@ -25,8 +26,11 @@ void setup(){
   mark_upx = 300;
   mark_upyz = 145;
   movment = false;
+  Timer1.initialize(5000);
+  Timer1.attachInterrupt( timerIsr );
 }
-
+/*  Timer1.stop();        //stop the counter
+  Timer1.restart();     //set the clock to zero*/
 lect sensordata(lect a){
   adxl.readXYZ(&a.x, &a.y, &a.z); 
   return a;
@@ -118,14 +122,12 @@ bool moviment_brusc(lect a,char eix){
   delay(50); 
 }
 */
-void test(){
+void timerIsr(){
   Serial.print("dintre");
   Serial.print(" , ");
 }
 
 void loop(){
-  void(*foo)(void);
-  foo = &test;
-  t.every(25,test);
-}
+  //t.every(1,test,0);
+  }
 

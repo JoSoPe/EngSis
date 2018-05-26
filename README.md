@@ -16,7 +16,8 @@ Les dades exportades de la base de dades es guardaran en el document exported.tx
 Llibreria timer:
 https://playground.arduino.cc/Code/Timer
 
-
+timer per interrupcions:
+https://www.pjrc.com/teensy/td_libs_TimerOne.html
 
 ------------------------------------------------------
 
