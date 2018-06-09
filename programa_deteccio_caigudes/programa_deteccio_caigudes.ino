@@ -24,10 +24,10 @@ Timer t;
 
 /*-------------------*/    
 void setup(){
-  
+  noInterrupts();
   Serial.begin(9600);
   adxl.powerOn();
-  isrmili = 20; //10
+  isrmili = 500; //10
   ISRmicro = isrmili * 1000;
   start = 0;
   mark_upx = 300;
@@ -38,6 +38,7 @@ void setup(){
   Serial.print("setup");
   Serial.print(" ");
   //attachInterrupt(void *intent(),50000);
+  interrupts();
 }
 
 /*-------------------*/    
@@ -94,44 +95,26 @@ bool sudden(lect a,char axis){
 
 /*-------------------*/    
 void intent(void){
-  Serial.print("intent");
+  noInterrupts();
   lect c;
   lect d;
-  Serial.print("lect created");
   d = sensordata(c);
-  Serial.print("data readed");
   c = d;
-  //toprint(c);
-  //Timer1.stop();        //stop the counter
-  //b = sensordata(a);
-  Serial.print("hola");
-  //toprint(sensordata(a));
-  //el que fem dintre el interrupcio
-  //Timer1.restart();     //set the clock to zero
-  return;
+  toprint(sensordata(a));
+  interrupts();  
 }
 
 /*-------------------*/    
 void timerIsr(){
-  /*cli();
-  Serial.print("asdas");
-  /*Serial.print("\n");
-  //sei();
-  intent();
-  Serial.print("ptmrd");
-  Serial.print("bye");
-  Serial.print("\n");*/
-  //reti();
+  a = b;
+//  intent();
 }
 
 /*-------------------*/    
 void loop(){
-  Serial.print("cli");
-  cli();
+  noInterrupts();
   intent();
-  sei(); 
-  Serial.print("reti");
-  intent();
+  interrupts();
   //delay(10);
   Serial.print(start);
 }     

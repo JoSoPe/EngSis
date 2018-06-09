@@ -20,7 +20,8 @@ typedef struct{//per guardar les dades
   Timer t;
 /*-------------------*/    
 void setup(){
-  Serial.begin(9600);
+  //Serial.begin(9600);
+  Serial.begin(19200);
   adxl.powerOn();
   start = 1;
   mark_upx = 300;
@@ -38,10 +39,13 @@ lect sensordata(lect a){
   
 void toprint(lect a){
   Serial.print(a.x);
+  Serial.print("\n");
+  /*
   Serial.print(" , ");
   Serial.print(a.y);
   Serial.print(" , ");
   Serial.println(a.z);
+  */
   //Serial.print("correcte");
 }
 
@@ -122,12 +126,22 @@ bool moviment_brusc(lect a,char eix){
   delay(50); 
 }
 */
+void intern(lect a){
+  a=sensordata(a);
+  toprint(a);
+}
 void timerIsr(){
-  Serial.print("dintre");
-  Serial.print(" , ");
+  //noInterrupts();
+  //Serial.print("dintre");
+  //Serial.print(" , ");
+  intern(b);
+  //interrupts();
 }
 
 void loop(){
   //t.every(1,test,0);
+  delay(10);
+  intern(a);  
+  moviment_brusc(a,'x');
   }
 
