@@ -6,6 +6,7 @@ lite:
 	sqlite3 lecturasensor.db
 octave:
 	octave
+
 .PHONY:
 
 clean:

@@ -15,26 +15,31 @@ typedef struct{//to host data
 /*-------------------*/    
 int x,y,z;
 int start;
-int state = 0;
+int fallcheck,read_count; 
+int state;
 int isrmili, ISRmicro;
-int mark_upx = 300;
-int mark_upyz = 145;
-bool movment = false;
-lect a,b,avg;
+int mark_upx,mark_upyz;
+bool movment;
+lect value,value2,avg;
 Timer t;
 
 /*-------------------*/    
 void setup(){
   Serial.begin(9600);
   adxl.powerOn();
-  isrmili = 1000; //10
+/*--globalvariable_settings--*/
+  isrmili = 10;           // Period of executing the timerIsr interrupt.
   ISRmicro = isrmili * 1000;
   start = 0;
-  mark_upx = 300;
-  mark_upyz = 145;
+  fallcheck = 50;         // Waiting time to decide whether its a fall or not.
+  read_count = fallcheck/isrmili;
+  mark_upx = 300;         //Top X value to detect a fall
+  mark_upyz = 145;        //Top Y & Z valuesto detect a fall when mark_upx is surpassed
   movment = false;
+  state = 0;
+/*--Timer_configuration--*/  
   noInterrupts();
-  Timer1.initialize(ISRmicro); //top timer counter in microseconds
+  Timer1.initialize(ISRmicro);        //top timer counter in microseconds
   Timer1.attachInterrupt( timerIsr ); //timer interruption service routine
   Serial.print("0");
   Serial.print(" ");
@@ -42,43 +47,42 @@ void setup(){
 }
 
 /*-------------------*/    
-lect sensordata(lect a){
+lect sensordata(lect value){
   interrupts();
-  adxl.readXYZ(&a.x, &a.y, &a.z); 
+  adxl.readXYZ(&value.x, &value.y, &value.z); 
   noInterrupts();
-  return a;
+  return value;
 }
 
 /*-------------------*/    
-void toprint(lect a){
-  Serial.print(a.x);
+void toprint(lect value){
+  Serial.print(value.x);
   Serial.print(" , ");
-  Serial.print(a.y);
+  Serial.print(value.y);
   Serial.print(" , ");
-  Serial.println(a.z);
-  //Serial.print("ok");
+  Serial.println(value.z);
 }
 
 /*-------------------*/    
-bool sudden(lect a,char axis){
+bool sudden(lect value,char axis){
   bool movement;
   switch (axis){
     case 'x':
-      if ((a.x >= mark_upx) or (a.x <= - mark_upx)){
+      if ((value.x >= mark_upx) or (value.x <= - mark_upx)){
         movement = true;
       }
       else{
         movement = false;
       }
     case 'y':
-      if ((a.y >= mark_upyz) or (a.y <= - mark_upyz)){
+      if ((value.y >= mark_upyz) or (value.y <= - mark_upyz)){
         movement = true;
       }
       else{
         movement = false;
       }
     default:
-      if ((a.z >= mark_upyz) or (a.z <= - mark_upyz)){
+      if ((value.z >= mark_upyz) or (value.z <= - mark_upyz)){
         movement = true;
       }
       else{
@@ -89,32 +93,74 @@ bool sudden(lect a,char axis){
 }
 
 /*-------------------*/    
-void intent(void){
-  //Serial.print("2.0");
-  lect c;
-  lect d;
-  d = sensordata(c);
-  c = d;
-  //toprint(sensordata(a)); 
-}
-
-/*-------------------*/    
 void timerIsr(){
   Timer1.stop();
-  if (state == 5){
-    state = 0;
-  }
-  else {
-      state = state + 1;
-  }
+  switch (state){
+    
+    case 0:
+      if (sudden(value,'x')){
+        state = 1;
+      }
+      else{
+        state = 0;
+      }
+      break;
+    
+    case 1:
+      if ((sudden(value,'y')) or (sudden(value,'z'))){
+        state = 2;
+      }
+      else{
+        state = 0;
+      }
+      break;
+    
+    case 2:
+      if (start = fallcheck){
+        start = 0;
+        state = 3;
+      }
+      else{
+        if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
+          start = 0;
+          state = 4;
+        }
+        else{
+          start = start+1;
+        }
+      }
+      break;
+
+    case 3:
+     if (start = fallcheck){
+        start = 0;
+        state = 0; //false alarm
+      } 
+      else{
+        if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
+          start = 0;
+          state = 4;
+        }
+        else{
+          start = start+1;
+        }
+      }
+      break;      
+
+    case 4:
+      //fall deteted
+      //blink_led
+      break;
+  }      
+
+  
+  
+
   Timer1.resume();
 }
 
 /*-------------------*/    
 void loop(){
-  intent();
-  Serial.print(state);
-  Serial.print("\n");
 }     
 
   

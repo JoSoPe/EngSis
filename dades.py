@@ -83,13 +83,16 @@ def export_data(export):
                 for information in data:
                     #print (data)
                     #print (p)
-                    if p == 5:
-                        f.write(str(information))
-                        f.write('\n')
+                    #if p == 5:
+                        #f.write(str(information))
+                        
                     if (p ==1) or (p == 2) or (p ==3):
                         p = p+1
                         f.write(str(information))
-                        f.write(',')
+                        if (p == 3):
+                            f.write('\n')
+                        else:
+                            f.write(',')
                     else:
                         p = p+1
         else:
