@@ -55,8 +55,8 @@ class TimerOne
     void start();
     void stop();
     void restart();
-	void resume();
-	unsigned long read();
+    void resume();
+    unsigned long read();
     void pwm(char pin, int duty, long microseconds=-1);
     void disablePwm(char pin);
     void attachInterrupt(void (*isr)(), long microseconds=-1);

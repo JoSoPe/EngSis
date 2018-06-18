@@ -15,42 +15,37 @@ typedef struct{//to host data
 /*-------------------*/    
 int x,y,z;
 int start;
+int state = 0;
 int isrmili, ISRmicro;
 int mark_upx = 300;
 int mark_upyz = 145;
-bool movment,estat = false;
+bool movment = false;
 lect a,b,avg;
 Timer t;
 
 /*-------------------*/    
 void setup(){
-  noInterrupts();
   Serial.begin(9600);
   adxl.powerOn();
-  isrmili = 500; //10
+  isrmili = 1000; //10
   ISRmicro = isrmili * 1000;
   start = 0;
   mark_upx = 300;
   mark_upyz = 145;
   movment = false;
+  noInterrupts();
   Timer1.initialize(ISRmicro); //top timer counter in microseconds
   Timer1.attachInterrupt( timerIsr ); //timer interruption service routine
-  Serial.print("setup");
+  Serial.print("0");
   Serial.print(" ");
-  //attachInterrupt(void *intent(),50000);
   interrupts();
 }
 
 /*-------------------*/    
 lect sensordata(lect a){
+  interrupts();
   adxl.readXYZ(&a.x, &a.y, &a.z); 
-  /*Serial.print(a.x);
-  Serial.print(" , ");
-  Serial.print(a.y);
-  Serial.print(" , ");
-  Serial.println(a.z);*/
-  //Serial.print(a.x);
-  //return a;
+  noInterrupts();
   return a;
 }
 
@@ -95,27 +90,31 @@ bool sudden(lect a,char axis){
 
 /*-------------------*/    
 void intent(void){
-  noInterrupts();
+  //Serial.print("2.0");
   lect c;
   lect d;
   d = sensordata(c);
   c = d;
-  toprint(sensordata(a));
-  interrupts();  
+  //toprint(sensordata(a)); 
 }
 
 /*-------------------*/    
 void timerIsr(){
-  a = b;
-//  intent();
+  Timer1.stop();
+  if (state == 5){
+    state = 0;
+  }
+  else {
+      state = state + 1;
+  }
+  Timer1.resume();
 }
 
 /*-------------------*/    
 void loop(){
-  noInterrupts();
   intent();
-  interrupts();
-  //delay(10);
-  Serial.print(start);
+  Serial.print(state);
+  Serial.print("\n");
 }     
+
   
