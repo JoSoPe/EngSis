@@ -12,7 +12,9 @@ typedef struct{//to host data
   int z;
 } lect;
 
-/*-------------------*/    
+/*-------------------*/   
+const int led = 13; 
+int LEDState;
 int x,y,z;
 int start;
 int fallcheck,read_count; 
@@ -28,6 +30,8 @@ void setup(){
   Serial.begin(9600);
   adxl.powerOn();
 /*--globalvariable_settings--*/
+  LEDState = LOW;
+  pinMode(led,OUTPUT);
   isrmili = 10;           // Period of executing the timerIsr interrupt.
   ISRmicro = isrmili * 1000;
   start = 0;
@@ -41,8 +45,6 @@ void setup(){
   noInterrupts();
   Timer1.initialize(ISRmicro);        //top timer counter in microseconds
   Timer1.attachInterrupt( timerIsr ); //timer interruption service routine
-  Serial.print("0");
-  Serial.print(" ");
   interrupts();
 }
 
@@ -51,6 +53,7 @@ lect sensordata(lect value){
   interrupts();
   adxl.readXYZ(&value.x, &value.y, &value.z); 
   noInterrupts();
+  //toprint(value);
   return value;
 }
 
@@ -92,64 +95,91 @@ bool sudden(lect value,char axis){
   return movement;
 }
 
+/*-------------------*/
+void E0(){
+  if (sudden(value,'x')){
+    state = 1;
+  }
+  else{
+    state = 0;
+  }
+}
+
+/*-------------------*/
+void E1(){
+  if ((sudden(value,'y')) or (sudden(value,'z'))){
+    state = 2;
+  }
+  else{
+    state = 0;
+  }
+}
+
+/*-------------------*/
+void E2(){
+  if (start = fallcheck){
+    start = 0;
+    state = 3;
+  }
+  else{
+    if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
+      start = 0;
+      state = 4;
+    }
+    else{
+      start = start+1;
+    }
+  }  
+}
+
+/*-------------------*/
+void E3(){
+  if (start = fallcheck){
+    start = 0;
+    state = 0; //false alarm
+  } 
+  else{
+    if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
+      start = 0;
+      state = 4;
+    }
+    else{
+      start = start+1;
+    }
+  }  
+}
+
+/*-------------------*/
+void E4(){
+  digitalWrite(led,LEDState);  //fall deteted
+  LEDState =! LEDState;        //blink_led
+  Serial.print("Fall Detected");
+}
+
 /*-------------------*/    
 void timerIsr(){
   Timer1.stop();
+  sensordata(value);
   switch (state){
     
     case 0:
-      if (sudden(value,'x')){
-        state = 1;
-      }
-      else{
-        state = 0;
-      }
+      E0();
       break;
     
     case 1:
-      if ((sudden(value,'y')) or (sudden(value,'z'))){
-        state = 2;
-      }
-      else{
-        state = 0;
-      }
+      E1();
       break;
-    
+      
     case 2:
-      if (start = fallcheck){
-        start = 0;
-        state = 3;
-      }
-      else{
-        if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
-          start = 0;
-          state = 4;
-        }
-        else{
-          start = start+1;
-        }
-      }
+      E2();
       break;
 
     case 3:
-     if (start = fallcheck){
-        start = 0;
-        state = 0; //false alarm
-      } 
-      else{
-        if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
-          start = 0;
-          state = 4;
-        }
-        else{
-          start = start+1;
-        }
-      }
+      E3();
       break;      
 
     case 4:
-      //fall deteted
-      //blink_led
+      E4();
       break;
   }      
 
