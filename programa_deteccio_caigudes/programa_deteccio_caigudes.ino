@@ -159,7 +159,7 @@ void E4(){
 /*-------------------*/    
 void timerIsr(){
   Timer1.stop();
-  sensordata(value);
+  value = sensordata(value);
   switch (state){
     
     case 0:
