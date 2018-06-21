@@ -13,11 +13,10 @@ typedef struct{//to host data
 } lect;
 
 /*-------------------*/   
-const int led = 13; 
-int LEDState;
+int get_up_count,get_up;
 int x,y,z;
 int start;
-int fallcheck,read_count; 
+int fallcheck,doublefallcheck,read_count,fallcheck_isr,doublefallcheck_isr; 
 int state;
 int isrmili, ISRmicro;
 int mark_upx,mark_upyz;
@@ -30,13 +29,14 @@ void setup(){
   Serial.begin(9600);
   adxl.powerOn();
 /*--globalvariable_settings--*/
-  LEDState = LOW;
-  pinMode(led,OUTPUT);
   isrmili = 10;           // Period of executing the timerIsr interrupt.
   ISRmicro = isrmili * 1000;
   start = 0;
-  fallcheck = 50;         // Waiting time to decide whether its a fall or not.
-  read_count = fallcheck/isrmili;
+  fallcheck = 7000;         // Waiting time (ms) to decide whether its a fall or not.
+  fallcheck_isr = fallcheck/isrmili; //Waiting ISR to decide whether its a fall or not
+  doublefallcheck_isr = 1000/isrmili; //Ms after fall detected before lookingfor a stand-up-like try /interrupt lenght.
+  get_up_count = 0; //cunter of doublefalcheck_isr done
+  get_up = 2;           // times to count to doublefallcheck after first one has passed
   mark_upx = 300;         //Top X value to detect a fall
   mark_upyz = 145;        //Top Y & Z valuesto detect a fall when mark_upx is surpassed
   movment = false;
@@ -53,7 +53,6 @@ lect sensordata(lect value){
   interrupts();
   adxl.readXYZ(&value.x, &value.y, &value.z); 
   noInterrupts();
-  //toprint(value);
   return value;
 }
 
@@ -72,6 +71,9 @@ bool sudden(lect value,char axis){
   switch (axis){
     case 'x':
       if ((value.x >= mark_upx) or (value.x <= - mark_upx)){
+        movement = true;
+      }
+      if (abs(value.x) > mark_upx){
         movement = true;
       }
       else{
@@ -94,18 +96,27 @@ bool sudden(lect value,char axis){
   }
   return movement;
 }
-
 /*-------------------*/
 void E0(){
-  if (sudden(value,'x')){
+  int a,b;
+  a = abs(value.x);
+  b = a - 300;
+  start = 0;
+  if (b >= 0){
+    a = 1;
+  }
+  else{
+    a = 0;
+  }    
+  if (a == 1){
     state = 1;
   }
   else{
     state = 0;
   }
 }
-
 /*-------------------*/
+
 void E1(){
   if ((sudden(value,'y')) or (sudden(value,'z'))){
     state = 2;
@@ -117,80 +128,87 @@ void E1(){
 
 /*-------------------*/
 void E2(){
-  if (start = fallcheck){
-    start = 0;
-    state = 3;
+  int reset;
+  reset = 0;
+  if (start >= (fallcheck_isr/2)){
+    start = start + 1;
+    if (start == fallcheck_isr){
+      state = 4;
+    }
+    if ((sudden(value,'x')) or ((sudden(value,'y')) or (sudden(value,'z')))){
+      reset = 1;
+      state = 3;
+    }
+
   }
   else{
-    if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
-      start = 0;
-      state = 4;
-    }
-    else{
-      start = start+1;
-    }
-  }  
-}
-
+    start = start + 1;
+  }
+  if (reset == 1){
+    start = 0; 
+  }
+}  
 /*-------------------*/
 void E3(){
-  if (start = fallcheck){
-    start = 0;
-    state = 0; //false alarm
-  } 
-  else{
-    if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
+  Serial.print("fall");
+  if (start == doublefallcheck_isr){//inactive time has ended
+    //Serial.print("Xeic!!");
+    if (get_up_count == get_up){//and of waiting for activity and no activity detected
+      state = 4; //fall detected
       start = 0;
-      state = 4;
+      get_up_count = 0;
     }
     else{
-      start = start+1;
+      get_up_count = get_up_count + 1; //keep waiting for a try to get_up
+      if ((sudden(value,'x')) or (sudden(value,'y')) or (sudden(value,'z'))){
+        state = 0;//got up -> false alarm
+        Serial.print("False alarm");
+      }
     }
-  }  
-}
+  }
+  else{
+    start = start+1;
+  }
+}  
 
 /*-------------------*/
 void E4(){
-  digitalWrite(led,LEDState);  //fall deteted
-  LEDState =! LEDState;        //blink_led
-  Serial.print("Fall Detected");
+  Serial.print("Still on the floor");
 }
 
 /*-------------------*/    
 void timerIsr(){
   Timer1.stop();
   value = sensordata(value);
-  switch (state){
-    
+  switch (state){    
     case 0:
+      //Serial.print("E0");
       E0();
       break;
     
     case 1:
+      //Serial.print("E1");
       E1();
       break;
       
     case 2:
+      //Serial.print("E2");
       E2();
       break;
 
     case 3:
+      //Serial.print("E3");
       E3();
       break;      
 
     case 4:
+      //Serial.print("\n");
       E4();
       break;
-  }      
-
-  
-  
+  }       
 
   Timer1.resume();
 }
-
 /*-------------------*/    
 void loop(){
 }     
-
-  

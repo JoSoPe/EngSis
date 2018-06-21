@@ -1,41 +1,67 @@
 #include <Wire.h>
-#include <ADXL345.h> /*https://github.com/sparkfun/SparkFun_ADXL345_Arduino_Library/blob/master/src/SparkFun_ADXL345.h */
-#include <stdio.h>
 #include <Timer.h>
+#include <ADXL345.h>
+#include <stdio.h>
 #include <TimerOne.h>
 ADXL345 adxl; //variable adxl is an instance of the ADXL345 library
 
 
-typedef struct{//per guardar les dades
+typedef struct{//to host data
   int x;//x value
   int y;
   int z;
 } lect;
-/*-------------------*/    
-  int x,y,z;
-  int start;
-  int mark_up,mark_upx,mark_upyz;
-  bool movment;
-  lect a,b;
-  Timer t;
+
+/*-------------------*/   
+const int led = 13; 
+int LEDState;
+int x,y,z;
+int start;
+int fallcheck,read_count; 
+int state;
+int isrmili, ISRmicro;
+int mark_upx,mark_upyz;
+bool movment;
+lect value,value2,avg;
+Timer t;
+
+/*-------------------*/
+
 /*-------------------*/    
 void setup(){
-  //Serial.begin(9600);
-  Serial.begin(19200);
+  Serial.begin(9600);
   adxl.powerOn();
-  start = 1;
-  mark_upx = 300;
-  mark_upyz = 145;
+/*--globalvariable_settings--*/
+  LEDState = LOW;
+  pinMode(led,OUTPUT);
+  isrmili = 10;           // Period of executing the timerIsr interrupt.
+  ISRmicro = isrmili * 1000;
+  start = 0;
+  fallcheck = 50;         // Waiting time to decide whether its a fall or not.
+  read_count = fallcheck/isrmili;
+  mark_upx = 300;         //Top X value to detect a fall
+  mark_upyz = 145;        //Top Y & Z valuesto detect a fall when mark_upx is surpassed
   movment = false;
-  Timer1.initialize(5000);
-  Timer1.attachInterrupt( timerIsr );
+  state = 0;
+/*--Timer_configuration--*/  
+  noInterrupts();
+  Timer1.initialize(ISRmicro);        //top timer counter in microseconds
+  Timer1.attachInterrupt( timerIsr ); //timer interruption service routine
+  interrupts();
 }
-/*  Timer1.stop();        //stop the counter
-  Timer1.restart();     //set the clock to zero*/
-lect sensordata(lect a){
-  adxl.readXYZ(&a.x, &a.y, &a.z); 
-  return a;
+
+/*-------------------*/    
+lect sensordata(lect value){
+  interrupts();
+  adxl.readXYZ(&value.x, &value.y, &value.z); 
+  noInterrupts();
+  //toprint(value);
+  return value;
 }
+
+/*-------------------*/ 
+
+
   
 void toprint(lect a){
   Serial.print(a.x);
